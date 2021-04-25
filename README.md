@@ -1,16 +1,11 @@
 # animation_skill
 
-Have fun with animations
+Have fun with animations.
 
-## Getting Started
+## 1. Animations with PageView
 
-This project is a starting point for a Flutter application.
+| Original  | Reproduction |
+| ------------- | ------------- |
+| <img src="https://github.com/Filiponesco/Animation-skills/blob/master/videos/original.gif" width="525" height="394"/>  | <img src="https://github.com/Filiponesco/Animation-skills/blob/master/videos/Nagranie-z-ekranu-2021-04-25-o-2.gif" width="200" height="394"/>  |
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Time: 8H
