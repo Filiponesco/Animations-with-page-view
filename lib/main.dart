@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+final numberOfPages = 3;
 
 void main() {
   runApp(MyApp());
@@ -45,23 +48,24 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   PageController _controller;
   TweenSequence<Color> _colors;
-  Animation<Color> _animationColor;
-
+  final purpleColor = Color.fromARGB(255, 94, 60, 196);
+  final redColor = Color.fromARGB(255, 204, 51, 102);
+  final blueColor = Color.fromARGB(255, 103, 153, 255);
   @override
   void initState() {
     _controller = PageController();
     _colors = TweenSequence([
       TweenSequenceItem(
         tween: ColorTween(
-          begin: Colors.deepPurpleAccent,
-          end: Colors.red,
+          begin: purpleColor,
+          end: redColor,
         ),
         weight: 50,
       ),
       TweenSequenceItem(
         tween: ColorTween(
-          begin: Colors.red,
-          end: Colors.blue,
+          begin: redColor,
+          end: blueColor,
         ),
         weight: 50,
       ),
@@ -81,15 +85,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       create: (context) => PageOffsetNotifier(_controller),
       child: Consumer<PageOffsetNotifier>(
         builder: (context, notifier, child) => Scaffold(
-          backgroundColor: _colors.animate(AlwaysStoppedAnimation(notifier.page / 2)).value,
-          body: child,
-        ),
+            backgroundColor: _colors.animate(AlwaysStoppedAnimation(notifier.page / (numberOfPages - 1))).value,
+            body: child,
+            bottomNavigationBar: BottomNavigation(
+              pageController: _controller,
+            )),
         child: PageView(
           controller: _controller,
           children: [
             SinglePage(
               icon: Icons.home_work_outlined,
-              upText: 'Standard',
+              upText: 'Basic',
               bottomDescription: 'One time payment build and purchased ios apps',
               bottomText: 'All extensions included',
               index: 0,
@@ -103,7 +109,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
             SinglePage(
               icon: Icons.access_alarm_sharp,
-              upText: 'Standard',
+              upText: 'Premium',
               bottomDescription: 'One time payment build and purchased ios apps',
               bottomText: 'All extensions included',
               index: 2,
@@ -135,17 +141,9 @@ class SinglePage extends StatefulWidget {
 }
 
 class _SinglePageState extends State<SinglePage> {
-  Animation<Offset> _offsetAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: false,
       child: Column(
         children: [
           Expanded(
@@ -158,15 +156,17 @@ class _SinglePageState extends State<SinglePage> {
                 ),
                 child: child,
               ),
-              child: Text(
-                widget.upText,
-                style: Theme.of(context).textTheme.headline3,
+              child: Center(
+                child: Text(
+                  widget.upText,
+                  style: Theme.of(context).textTheme.headline3,
+                ),
               ),
             ),
           ),
-          Spacer(),
+          //Spacer(),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: Consumer<PageOffsetNotifier>(
               builder: (context, notifier, child) => Opacity(
                 opacity: _animationValueForSinglePage(notifier, widget.index),
@@ -193,20 +193,22 @@ class _SinglePageState extends State<SinglePage> {
                 padding: EdgeInsets.symmetric(horizontal: 64.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                  // mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      widget.bottomText,
-                      style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.w600),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(
-                      height: 32,
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 32.0),
+                      child: Text(
+                        widget.bottomText,
+                        style: Theme.of(context).textTheme.headline4.copyWith(fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                     Text(
                       widget.bottomDescription,
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme.of(context).textTheme.headline5.copyWith(
+                            color: Colors.white.withOpacity(.7),
+                          ),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -214,8 +216,6 @@ class _SinglePageState extends State<SinglePage> {
               ),
             ),
           ),
-          //Spacer(),
-          BottomNavigation(),
         ],
       ),
     );
@@ -223,6 +223,14 @@ class _SinglePageState extends State<SinglePage> {
 }
 
 class BottomNavigation extends StatefulWidget {
+  final PageController pageController;
+
+  const BottomNavigation({
+    Key key,
+    @required this.pageController,
+  })  : assert(pageController != null),
+        super(key: key);
+
   @override
   _BottomNavigationState createState() => _BottomNavigationState();
 }
@@ -230,9 +238,73 @@ class BottomNavigation extends StatefulWidget {
 class _BottomNavigationState extends State<BottomNavigation> {
   @override
   Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        color: Colors.transparent,
+        height: kBottomNavigationBarHeight,
+        padding: EdgeInsets.symmetric(horizontal: 36.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ThreeDots(
+              pageController: widget.pageController,
+            ),
+            FloatingActionButton(
+              onPressed: () {},
+              child: Icon(
+                Icons.arrow_forward,
+                size: 26.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ThreeDots extends StatelessWidget {
+  final PageController pageController;
+
+  const ThreeDots({
+    Key key,
+    @required this.pageController,
+  })  : assert(pageController != null),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SmoothPageIndicator(
+      controller: pageController,
+      count: numberOfPages,
+      effect: SlideEffect(
+        dotColor: Colors.grey,
+        activeDotColor: Colors.white,
+        dotHeight: 12.0,
+        dotWidth: 12.0,
+      ),
+    );
+  }
+}
+
+class SingleDot extends StatelessWidget {
+  final bool isActive;
+
+  const SingleDot({
+    Key key,
+    this.isActive = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final size = isActive ? 14.0 : 12.0;
     return Container(
-      height: kBottomNavigationBarHeight,
-      color: Colors.white,
+      height: size,
+      width: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isActive ? Colors.white : Colors.grey,
+      ),
     );
   }
 }
