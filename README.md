@@ -1,8 +1,6 @@
-# animation_skill
+# Animations with PageView
 
 Have fun with animations.
-
-## 1. Animations with PageView
 
 | Original  | Reproduction |
 | ------------- | ------------- |
